@@ -42,7 +42,7 @@
     var year = document.getElementById('Year');
 
   	async function fav(){
-	    const url = 'http://www.omdbapi.com/?apikey=f6ee593c&t='+value;
+	    const url = 'https://www.omdbapi.com/?apikey=f6ee593c&t='+value;
 		const res = await fetch(`${url}`);
 		const data = await res.json();
         console.log(data);

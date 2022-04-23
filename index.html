@@ -194,7 +194,7 @@
 
 	//creates the favorite list
 	async function fav(val){
-	    const url = 'http://www.omdbapi.com/?apikey=f6ee593c&t='+val;
+	    const url = 'https://www.omdbapi.com/?apikey=f6ee593c&t='+val;
 		const res = await fetch(`${url}`);
 		const data = await res.json();
         
