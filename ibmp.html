@@ -1,0 +1,226 @@
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		#box{
+	   	    border: 1px solid black;
+            width: 471px;
+            margin-top: -7px;
+            margin-left: 163px;
+    	}
+    	button{
+    	    height: 46px;
+    	}
+    	input{
+    		width: 473px;
+            height: 47px;
+            font-size: 29px;
+            margin: 66px 0px 0px 163px;
+    	}
+    	#favorite{
+    		position: absolute;
+            left: 800px;
+            top: -14px;
+            margin: 52px 0px 0px 64px;
+    	}
+    	.img1{
+    		height: 50px;
+            width: 50px
+    	}
+    	.img{
+    		height: 20px;
+    		width: 20px;
+    		position: relative;
+            top: -13px;
+            left: 54px;
+    	}
+    	a{
+    		text-decoration: none;
+    		color: black;
+    		font-size: 19px;
+    		position: relative;
+            top: -18px;
+            left: 25px;
+    	}
+        #favvi{
+        	margin-top: 80px;
+        }
+        h1{
+        	font-size: 50px;
+        }
+        #search{
+        	height: 20px;
+            width: 20px;
+        }
+	</style>
+	
+</head>
+<body>
+<input type="text" name="search" onkeyup="findmovies()" placeholder="search movie...">
+<button onclick="searchresult()"><img src='search.png' id="search"></button>
+<div id="box"></div>
+<div id="favorite"><h1>FAVORIES</h1><p id='favvi'></p></div>
+<script type="text/javascript">
+
+   var favorite = document.getElementById('favvi');
+
+   //get all items from local storage on page loading
+   for (var i = 0; i<localStorage.length; i++) {
+        var titleimg = localStorage.getItem(localStorage.key(i));
+
+        var title =0;
+        var imgsrc= 0;
+        var d=0;
+        for(var j=0; j<titleimg.length; j++){
+        	if(titleimg.charAt(j)=='|'){
+        		d=j;
+        		title= titleimg.slice(0,d);
+        	}
+        	if(j==titleimg.length-1){
+        		imgsrc=titleimg.slice(d+1,j+1);
+        	}
+        }
+        
+        favorite.innerHTML += `<p id='${localStorage.key(i)}'>
+        <img src='${imgsrc}' class='img1'>
+        <a href='page.html?val=${title}'>${title}</a>
+        <img src='icons8-delete-24.png' onmouseenter="enterdel('${title}')" onmouseleave="leavedel('${title}')" onclick='delet("${localStorage.key(i)}")' class='img' id='${title}'>
+        </p>
+        <br>`;
+    }
+       
+    
+    //deletes the movie from favorite list
+    function delet(key){
+      var obj = document.getElementById(key);
+      obj.remove();
+      localStorage.removeItem(key);
+    }
+    
+
+    //on clikcing the search button redirect to info page
+    function searchresult(){
+      const val = (document.querySelector('input').value).trim();
+      window.location.href = `page.html?val=${val}`;
+    }
+
+
+    //fetches the data from the url and pass the data to the movielist function
+	async function loadmovie(value) {
+		
+		const url = 'https://www.omdbapi.com/?apikey=f6ee593c&s='+value;
+		const res = await fetch(`${url}`);
+		const data = await res.json();
+
+		if(data.Response == 'True'){			
+			movielist(data.Search);						
+		}
+		
+	}
+
+
+	//calls the loadmovie function 
+	function movies(){
+	   const val = (document.querySelector('input').value).trim();
+	   loadmovie(val);	
+	}
+
+
+	//finds the movies on key up
+	function findmovies(){
+	   const val = document.querySelector('input').value;
+	   if(val==""){
+         var box = document.getElementById('box');
+		 box.innerHTML =  "";
+	   }
+	   movies();
+	}
+
+
+    var see = 0;
+
+
+	//displays the search result under search box
+	function movielist(movies){
+		var box = document.getElementById('box');
+		box.innerHTML =  "";
+		
+		
+		for(let i=0; i<movies.length; i++){
+			see = 0;
+			var send = movies[i].imdbID;
+			var id = 'heartwhite.png';
+			for (var j = 0; j<localStorage.length; j++) {
+                 var a = localStorage.key(j);
+                 
+                 if(a==send){
+                 	see = 1;
+                 	id = 'heart.png';
+                 }
+            }
+			box.innerHTML +=`<p>
+			<img src='${movies[i].Poster}' class='img1'>
+			<a class='link' href='page.html?val=${movies[i].Title}'>` +movies[i].Title + `</a>
+			<img src="${id}" class='img' id='${send}' onmouseenter="enter('${send}')" onmouseleave="leave('${send}',${see})" onclick='fav("${movies[i].Title}")'>
+			</p>
+			<br>`;			
+		}
+	    
+	    
+	}
+	
+    
+    //hover functions for image change
+	function enter(id) {		    
+	    document.getElementById(id).src = 'heart.png';			
+	}
+	function leave(id,test){
+		if(test==0){
+			document.getElementById(id).src = 'heartwhite.png';
+		}
+		else if(see==1){
+			document.getElementById(id).src = 'heart.png';
+		}		
+	}
+	function enterdel(id){
+		console.log(id);
+     document.getElementById(id).src = 'icons8-delete-30.png';
+	}
+	function leavedel(id){
+		console.log(id);
+     document.getElementById(id).src = 'icons8-delete-24.png';
+	}
+
+
+	//creates the favorite list
+	async function fav(val){
+	    const url = 'http://www.omdbapi.com/?apikey=f6ee593c&t='+val;
+		const res = await fetch(`${url}`);
+		const data = await res.json();
+        
+		if(data.Response == 'True'){
+			var count = 0;
+			  for (var j = 0; j<localStorage.length; j++) {
+                 var a = localStorage.key(j);
+                 
+                 if(a==data.imdbID){
+                 	count = 1;
+                   }
+              }
+              if(count == 0){
+			   var fav = document.getElementById('favvi');
+               fav.innerHTML += `<p id='${val}'>
+               <img src='${data.Poster}' class='img1'>
+               <a href='page.html?val=${val}'>${data.Title}</a>
+               <img src='icons8-delete-24.png' onmouseenter="enterdel('${data.Title}')" onmouseleave="leavedel('${data.Title}')" onclick='delet("${val}")' class='img' id='${data.Title}'>
+               </p>
+               <br>`;
+               
+               localStorage.setItem(data.imdbID, data.Title+"|"+data.Poster);
+                }
+        }	    
+	}
+	
+</script>
+</body>
+</html>

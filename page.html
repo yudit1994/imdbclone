@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style >
+		#Year,#plot{
+       font-size: 24px;
+		}
+		#title{
+			font-size: 50px;
+		}
+		img{
+			width:400px;
+		}
+    #movie{
+    	position: absolute;
+      top: 0px;
+      left: 448px;
+    }
+	</style>
+</head>
+<body>
+	<div>
+  	<img id="myImg" src="">
+  </div>
+  <div id="movie">
+  	<h1 id="title"></h1>
+    <p id="director"></p>
+  	<p id="Year"></p>
+  	<p id="plot"></p>
+  	
+  </div>
+
+  <script type="text/javascript">
+  	var url_string = window.location.href ;
+  	var url = new URL(url_string);
+    var value = url.searchParams.get("val");
+    
+    var title = document.getElementById('title');
+    var year = document.getElementById('Year');
+
+  	async function fav(){
+	    const url = 'http://www.omdbapi.com/?apikey=f6ee593c&t='+value;
+		const res = await fetch(`${url}`);
+		const data = await res.json();
+        console.log(data);
+		if(data.Response == 'True'){
+						
+			
+            title.innerHTML += `<p>${data.Title}</p>`
+            year.innerHTML += `<p>${data.Year}</p>`
+            document.getElementById("myImg").src = data.Poster;
+            document.getElementById("plot").innerHTML = data.Plot;
+            document.getElementById("director").innerHTML = data.Director;
+						 
+	    }
+	    else{
+	         title.innerHTML += `<p>no movie found</p>`	
+	    }
+	
+	}
+	fav();
+  </script>
+</body>
+</html>
